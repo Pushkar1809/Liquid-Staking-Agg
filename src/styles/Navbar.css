@@ -1,0 +1,17 @@
+.left {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
+.left .links a {
+    text-decoration: none;
+    color: inherit;
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+    transition: background ease-in-out 0.2s;
+}
+
+.left .links a:hover {
+    background-color: rgba(0, 128, 128, 0.2);
+}
