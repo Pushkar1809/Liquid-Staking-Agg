@@ -14,8 +14,8 @@ const Tab = styled.div`
 	justify-content: center;
 	align-items: center;
 	cursor: pointer;
-    padding: 1rem 2rem;
-    border-radius: 1rem 1rem 0 0;
+    padding: 1rem 3rem;
+    border-radius: 0.5rem 0.5rem 0 0;
     background-color: white;
 `;
 

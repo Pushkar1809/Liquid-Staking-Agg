@@ -5,14 +5,11 @@
     color: var(--color-accent);
 }
 
-.connect-wallet {
-    color: white;
-    font-size: 1rem;
-    background-color: var(--color-accent);
-    border-radius: 0.25rem;
-    padding: 0.75rem 1.5rem;
-    font-weight: 700;
-    border: none;
+@media only screen and (max-width: 768px) {
+    .logo {
+        font-size: 1rem;
+        line-break: break-all;
+    }
 }
 
 .connect-wallet:hover {

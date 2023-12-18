@@ -1,0 +1,21 @@
+.amount-input {
+    border: none;
+    padding: 0.5rem 1rem;
+    font-size: 2rem;
+    font-weight: 600;
+    width: 90%;
+    background-color: transparent;
+}
+
+.amount-input:focus {
+    outline: none;
+}
+
+.max-btn {
+    background-color: var(--color-accent);
+    border: none;
+    color: white;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    font-size: 0.75rem;
+}
