@@ -3,7 +3,7 @@ import styled from 'styled-components';
 
 const Tabs = styled.div`
 	position: absolute;
-    top: -2.75rem;
+    top: -2.25rem;
     left: 0;
     display: flex;
     align-items: center;
@@ -14,9 +14,10 @@ const Tab = styled.div`
 	justify-content: center;
 	align-items: center;
 	cursor: pointer;
-    padding: 1rem 3rem;
+    padding: 1.5rem 3rem;
     border-radius: 0.5rem 0.5rem 0 0;
     background-color: white;
+	padding-top: 0.75rem;
 `;
 
 const StakeUnstakeTabs = ({activeTask, setActiveTask}) => {

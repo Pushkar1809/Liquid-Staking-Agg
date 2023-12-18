@@ -9,6 +9,7 @@ const Nav = styled.div`
     align-items: center;
     padding: 2rem;
     width: 100%;
+    gap: 4rem;
 `
 
 const Navbar = () => {

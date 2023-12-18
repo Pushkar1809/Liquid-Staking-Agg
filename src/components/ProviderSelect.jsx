@@ -2,10 +2,13 @@ import React from 'react';
 import styled from 'styled-components';
 
 const SelectContainer = styled.div`
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-`
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	@media only screen and (max-width: 548px) {
+		flex-direction: column;
+	}
+`;
 
 const SelectElement = styled.div`
     width: 50%;
@@ -17,6 +20,10 @@ const SelectElement = styled.div`
     display: flex;
     align-items: center;
     justify-content: center;
+
+    @media only screen and (max-width: 548px) {
+        width: 100%;
+    }
 `
 
 const ProviderSelect = ({protocol, setProtocol}) => {
@@ -24,9 +31,9 @@ const ProviderSelect = ({protocol, setProtocol}) => {
     return (
 			<SelectContainer>
 				<SelectElement
-					style={protocol==="strader"?activeTabStyle:{}}
-					onClick={() => setProtocol("strader")}>
-					Strader
+					style={protocol==="stader"?activeTabStyle:{}}
+					onClick={() => setProtocol("stader")}>
+					stader
 				</SelectElement>
 				<SelectElement
 					style={protocol==="lido"?activeTabStyle:{}}
