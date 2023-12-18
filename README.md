@@ -8,3 +8,8 @@
 3. Use a styling library (e.g., styled-components or Material-UI) to enhance the visual appeal of the application.
 4. Ensure a responsive design for a seamless user experience.
 5. Implement best practices for securely handling user data and interacting with smart contracts.
+
+### To Run
+1. Clone the Repo
+2. Install depedencies `npm i`
+3. Start the dev server `npm start`
