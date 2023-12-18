@@ -17,6 +17,7 @@ export const useUser = () => {
         setIsCorrectNetwork(network.name === 'goerli');
 		const nativeBalanceWei = await localProvider.getBalance(userAddress);
 		const nativeBalance = ethers.formatEther(nativeBalanceWei);
+		console.log(nativeBalance)
 		setNativeBalance(nativeBalance);
 	};
 
