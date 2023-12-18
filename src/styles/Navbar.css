@@ -1,17 +1,20 @@
-.left {
-    display: flex;
-    align-items: center;
-    gap: 2rem;
+.logo {
+    font-size: 1.5rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--color-accent);
 }
 
-.left .links a {
-    text-decoration: none;
-    color: inherit;
-    padding: 0.5rem;
+.connect-wallet {
+    color: white;
+    font-size: 1rem;
+    background-color: var(--color-accent);
     border-radius: 0.25rem;
-    transition: background ease-in-out 0.2s;
+    padding: 0.75rem 1.5rem;
+    font-weight: 700;
+    border: none;
 }
 
-.left .links a:hover {
-    background-color: rgba(0, 128, 128, 0.2);
+.connect-wallet:hover {
+    opacity: 0.9;
 }
