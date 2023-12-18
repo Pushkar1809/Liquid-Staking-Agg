@@ -7,20 +7,14 @@ const Nav = styled.div`
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 2rem 5rem;
+    padding: 2rem;
+    width: 100%;
 `
 
 const Navbar = () => {
     return (
 			<Nav>
-				<div className="left">
-					<div className="logo">Staking Assignment</div>
-					<div className="links">
-						<a href="/stake">Stake</a>
-						<a href="/unstake">Unstake</a>
-					</div>
-				</div>
-
+				<div className="logo">Staking Assignment</div>
 				<ConnectWallet />
 			</Nav>
 		);

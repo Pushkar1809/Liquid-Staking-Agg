@@ -5,10 +5,12 @@ const UserContext = createContext({
     provider: null,
     signer: null,
     isCorrectNetwork: false,
+    navtiveBalance: null,
     setAddress: () => {},
     setProvider: () => {},
     setSigner: () => {},
     setIsCorrectNetwork: () => {},
+    setNativeBalance: () => {},
 })
 
 const UserContextProvider = (props) => {
@@ -16,6 +18,7 @@ const UserContextProvider = (props) => {
     const [provider, setProvider] = useState(null)
     const [signer, setSigner] = useState(null)
     const [isCorrectNetwork, setIsCorrectNetwork] = useState(false)
+    const [navtiveBalance, setNativeBalance] = useState(null)
 
     return (
         <UserContext.Provider value={{
@@ -23,10 +26,12 @@ const UserContextProvider = (props) => {
             provider,
             signer,
             isCorrectNetwork,
+            navtiveBalance,
             setAddress,
             setProvider,
             setSigner,
-            setIsCorrectNetwork
+            setIsCorrectNetwork,
+            setNativeBalance,
         }}>
             {props.children}
         </UserContext.Provider>
