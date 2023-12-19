@@ -2,7 +2,7 @@
 
 /* theme variables */
 :root {
-  --color-light: rgb(231, 245, 245);
+  --color-light: rgb(242, 249, 249);
   --color-gray: rgb(234, 230, 230);
   --color-dark: rgb(27, 31, 31);
   --color-accent: rgb(3, 163, 163);
@@ -18,6 +18,17 @@ body {
 .App {
   width: 75vw;
   margin: 0 auto;
+  position: relative;
+  height: 100vh;
+}
+
+.alert {
+  position: absolute;
+  bottom: 1rem;
+  left: 1rem;
+  right: 1rem; 
+  margin-left: auto;
+  margin-right: auto;
 }
 
 @media only screen and (max-width: 768px) {
