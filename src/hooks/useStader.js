@@ -6,7 +6,7 @@ import ETHxABI from "../abis/ETHxABI.json";
 import userWithdrawlManagerABI from "../abis/UserWithdrawlManagerABI.json"
 
 export const useStader = () => {
-    const { signer, address} = useContext(UserContext);
+    const { signer, address, setIsETHxApproved, setETHxBalance } = useContext(UserContext);
     const [contracts, setContracts] = useState({
         staderPoolManager: null,
         ETHx: null,
@@ -21,18 +21,18 @@ export const useStader = () => {
 
     useEffect(() => {
         const staderPoolManager = new Contract(
-					staderPoolManagerAdress,
-					StaderPoolManagerABI,
-					signer,
-				);
+            staderPoolManagerAdress,
+            StaderPoolManagerABI,
+            signer,
+        );
         const ETHx = new Contract(ETHxAddress, ETHxABI, signer);
         const userWithdrawlManager = new Contract(
-					userWithdrawlManagerAddress,
-					userWithdrawlManagerABI,
-					signer,
-				);
-        setContracts({staderPoolManager, ETHx, userWithdrawlManager})
-    }, [signer])
+            userWithdrawlManagerAddress,
+            userWithdrawlManagerABI,
+            signer,
+        );
+        setContracts({ staderPoolManager, ETHx, userWithdrawlManager });
+    }, [signer]);
 
     const stake = async (value) => {
         try {
@@ -44,24 +44,18 @@ export const useStader = () => {
     }
 
     const unstake = async (value) => {
+        console.log(value)
         try {
-            const tx = await contracts.userWithdrawlManager.requestWithdraw(value, address, 1);
+            const tx = await contracts.userWithdrawlManager.requestWithdraw(value, address);
+            contracts.userWithdrawlManager.on("WithdrawRequestReceived", (a, b, c, d) => {
+                console.log(a, b, c, d);
+            });
             // console.log("Unstaking Successful!", tx);
         } catch (err) {
             console.error("Unstaking Failed", err);
         }
         
     }
-
-    const approve = async () => {
-        try {
-            const tx = await contracts.ETHx.approve(address, parseEther("1000000"));
-            // console.log("Token approved successfully", tx);
-        } catch (err) {
-            console.error("Failed to approve", err);
-        }
-        
-    } 
 
     const getExchangeRate = async () => {
         try {
@@ -72,14 +66,32 @@ export const useStader = () => {
         }
     }
 
-    const isApproved = async () => {
+    const getBalance = async () => {
         try {
-            const allowance = await contracts.ETHx.allowance(address, ZeroAddress);
-            return allowance > 0;
+            const balance = await contracts.ETHx.balanceOf(address);
+            setETHxBalance(formatUnits(balance, 18));
         } catch (err) {
-            console.error("Failed to check allowance", err);
+            console.err("Failed to get balance", err);
         }
     };
 
-    return {contracts, stake, unstake, approve, isApproved, getExchangeRate};
+    const approve = async (amount=10) => {
+        try {
+            const tx = await contracts.ETHx.approve(address, parseEther(amount));
+            console.log("Approved Successfully", tx);
+        } catch (err) {
+            console.log("Failed to Approve ETHx", err)
+        }
+    }
+
+    const isApproved = async () => {
+        try {
+            const allowance = await contracts.ETHx.allowance(address, address);
+            setIsETHxApproved(allowance !== '0n');
+        } catch (err) {
+            console.log("Failed to check approval status", err);
+        }
+    }
+
+    return {contracts, stake, unstake, getExchangeRate, getBalance, approve, isApproved};
 }

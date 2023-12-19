@@ -99,14 +99,13 @@ const Strong = styled.span`
 `
 
 const StakeCard = ({setAlert}) => {
-	const [exchangeRate, setExchangeRate] = useState(null)
+	const [exchangeRate, setExchangeRate] = useState(null);
 	const {initialise} = useUser();
 	const {
 		contracts: staderContracts,
 		stake: staderStake,
 		unstake: staderUnstake,
-		approve: staderApprove,
-		isApproved: isETHxApproved,
+		approve: approveETHx,
 		getExchangeRate: getStaderExchangeRate,
 	} = useStader();
 
@@ -114,13 +113,12 @@ const StakeCard = ({setAlert}) => {
 		contracts: lidoContracts,
 		stake: lidoStake,
 		unstake: lidoUnstake,
-		approve: lidoApprove,
-		isAprroved: isStETHApproved,
+		approve: approveStETH,
 	} = useLido();
     const [activeTask, setActiveTask] = useState('stake');
     const [protocol, setProtocol] = useState('stader');
 	const [amount, setAmount] = useState("");
-	const {provider, nativeBalance} = useContext(UserContext);
+	const {provider, nativeBalance, ETHxBalance, stETHBalance, isETHxApproved, isStETHApproved } = useContext(UserContext);
 
 	useEffect(() => {
 		const getRate = async () => {
@@ -135,28 +133,11 @@ const StakeCard = ({setAlert}) => {
 		}
 	}, [provider, protocol, getStaderExchangeRate])
 
-	const renderApproveOrUnstake = () => {
-		const unstakeFunc =
-			protocol === "stader" ? staderUnstake : lidoUnstake;
-		const approveFunc = protocol === "stader"  ? staderApprove : lidoApprove;
-		const isApproved = protocol === "stader" ? isETHxApproved() : isStETHApproved();
-		console.log(isETHxApproved())
-
-		return (
-			<ActionBtn
-				onClick={() =>
-					isApproved ? unstakeFunc(parseEther(amount)) : approveFunc()
-				}>
-				{isApproved ? "Unstake" : "Approve"}
-			</ActionBtn>
-		);
-	};
-
 	const handleStakeClick = () => {
 		if (protocol === "stader") {
 			staderStake(parseEther(`${amount}`));
 			setAlert({
-				content: "Staking in process",
+				content: "Staking in progress...",
 				isOpen: true,
 				level: "warning",
 			});
@@ -177,7 +158,7 @@ const StakeCard = ({setAlert}) => {
 		} else {
 			lidoStake(parseEther(`${amount}`));
 			setAlert({
-				content: "Staking in process",
+				content: "Staking in progress...",
 				isOpen: true,
 				level: "warning",
 			});
@@ -192,6 +173,124 @@ const StakeCard = ({setAlert}) => {
 		}
 		setAmount("")
 	}
+
+	const handleETHxApprove = () => {
+		approveETHx(ETHxBalance);
+		setAlert({
+			content: "Approval request being processed...",
+			isOpen: true,
+			level: "warning",
+		});
+		staderContracts.ETHx.on("Approval", (from, to, amount) => {
+			setAlert({
+				title: "ETHx Approved",
+				content: `${handleDecimals(formatUnits(amount, 18))}ETHx approved for ${to}`,
+				isOpen: true,
+				level: "success",
+			});
+		})
+	}
+
+	const handleETHxUnstake = () => {
+		staderUnstake(parseEther(`${amount}`));
+		setAlert({
+			content: "Staking in progress...",
+			isOpen: true,
+			level: "warning",
+		});
+		setAmount("");
+	}
+
+	const handleStETHApprove = () => {
+		approveStETH(stETHBalance);
+		setAlert({
+			content: "Approval request being processed...",
+			isOpen: true,
+			level: "warning",
+		});
+		lidoContracts.lido.on("Approval", (from, to, amount) => {
+			setAlert({
+				title: "stETH Approved",
+				content: `${handleDecimals(
+					formatUnits(amount, 18),
+				)}stETH approved for ${to}`,
+				isOpen: true,
+				level: "success",
+			});
+		});
+	}
+
+	const handleStETHUnstake = () => {
+		lidoUnstake(parseEther(`${amount}`));
+		setAlert({
+			content: "Staking in progress...",
+			isOpen: true,
+			level: "warning",
+		});
+		setAmount("");
+	}
+
+	const handleApproval = (approveFunction, approvalMessage, approvedTitle) => {
+		approveFunction();
+		setAlert({
+			content: approvalMessage,
+			isOpen: true,
+			level: "warning",
+		});
+		staderContracts.ETHx.on("Approval", (from, to, amount) => {
+			setAlert({
+				title: approvedTitle,
+				content: `${handleDecimals(
+					formatUnits(amount, 18),
+				)}${approvedTitle} approved for ${to}`,
+				isOpen: true,
+				level: "success",
+			});
+		});
+	};
+
+	const handleUnstake = (unstakeFunction, unstakeMessage) => {
+		unstakeFunction(parseEther(`${amount}`));
+		setAlert({
+			content: unstakeMessage,
+			isOpen: true,
+			level: "warning",
+		});
+		setAmount("");
+	};
+
+	const renderApproveOrUnstakeBtn = () => {
+		const isApproved = protocol === "stader" ? isETHxApproved : isStETHApproved;
+		const approveFunction =
+			protocol === "stader" ? handleETHxApprove : handleStETHApprove;
+		const unstakeFunction =
+			protocol === "stader" ? handleETHxUnstake : handleStETHUnstake;
+
+		if (isApproved) {
+			return (
+				<ActionBtn
+					disabled={!amount}
+					onClick={() =>
+						handleUnstake(unstakeFunction, "Staking in progress...")
+					}>
+					Unstake
+				</ActionBtn>
+			);
+		} else {
+			return (
+				<ActionBtn
+					onClick={() =>
+						handleApproval(
+							approveFunction,
+							"Approval request being processed...",
+							`${protocol} Approved`,
+						)
+					}>
+					Approve
+				</ActionBtn>
+			);
+		}
+	};
 
     return (
 			<Card>
@@ -226,25 +325,47 @@ const StakeCard = ({setAlert}) => {
 							min="0"
 							onChange={(e) => setAmount(e.target.value)}
 						/>
-						{provider && <MaxWrapper>
-							<MaxBtn
-								onClick={() => {
-									setAmount(nativeBalance);
-								}}
-								className="max-btn">
-								Max
-							</MaxBtn>
-							{nativeBalance && (
-								<span
-									style={{
-										fontSize: "0.65rem",
-										fontWeight: 400,
-										textAlign: "right",
-									}}>
-									Balance: <Strong>{handleDecimals(nativeBalance)}</Strong>ETH
-								</span>
-							)}
-						</MaxWrapper>}
+						{provider && (
+							<MaxWrapper>
+								<MaxBtn
+									onClick={() => {
+										if (activeTask === "stake") {
+											setAmount(nativeBalance);
+										} else {
+											setAmount(
+												protocol === "stader" ? ETHxBalance : stETHBalance,
+											);
+										}
+									}}
+									className="max-btn">
+									Max
+								</MaxBtn>
+								{nativeBalance && (
+									<span
+										style={{
+											fontSize: "0.65rem",
+											fontWeight: 400,
+											textAlign: "right",
+										}}>
+										Balance:{" "}
+										<Strong>
+											{handleDecimals(
+												activeTask === "stake"
+													? nativeBalance
+													: protocol === "stader"
+													? ETHxBalance
+													: stETHBalance,
+											)}
+										</Strong>
+										{activeTask === "stake"
+											? "ETH"
+											: protocol === "stader"
+											? "ETHx"
+											: "stETH"}
+									</span>
+								)}
+							</MaxWrapper>
+						)}
 					</Input>
 				</InputWrapper>
 
@@ -257,7 +378,9 @@ const StakeCard = ({setAlert}) => {
 						<InfoElement>
 							<label>You will recieve</label>
 							<span>
-								<Strong>{amount ? handleDecimals(amount / exchangeRate): 0}</Strong>
+								<Strong>
+									{amount ? handleDecimals(amount / exchangeRate) : 0}
+								</Strong>
 								{protocol === "stader" ? "ETHx" : "stETH"}
 							</span>
 						</InfoElement>
@@ -279,9 +402,7 @@ const StakeCard = ({setAlert}) => {
 					<ActionBtn disabled={!amount} onClick={handleStakeClick}>
 						Stake
 					</ActionBtn>
-				) : (
-					renderApproveOrUnstake()
-				)}
+				) : (renderApproveOrUnstakeBtn())}
 
 				{/* 5. Optional Info cards */}
 			</Card>

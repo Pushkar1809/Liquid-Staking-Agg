@@ -6,11 +6,19 @@ const UserContext = createContext({
     signer: null,
     isCorrectNetwork: false,
     nativeBalance: null,
+    isETHxApproved: false,
+    isStETHApproved: false,
+    ETHxBalance: "",
+    stETHBalance: "",
     setAddress: () => {},
     setProvider: () => {},
     setSigner: () => {},
     setIsCorrectNetwork: () => {},
     setNativeBalance: () => {},
+    setIsETHxApproved: () => {},
+    setIsStETHApproved: () => {},
+    setETHxBalance: () => {},
+    setStETHBalance: () => {},
 })
 
 const UserContextProvider = (props) => {
@@ -19,6 +27,10 @@ const UserContextProvider = (props) => {
     const [signer, setSigner] = useState(null)
     const [isCorrectNetwork, setIsCorrectNetwork] = useState(false)
     const [nativeBalance, setNativeBalance] = useState(null)
+    const [ETHxBalance, setETHxBalance] = useState("");
+    const [stETHBalance, setStETHBalance] = useState("");
+    const [isETHxApproved, setIsETHxApproved] = useState(false);
+    const [isStETHApproved, setIsStETHApproved] = useState(false);
 
     return (
         <UserContext.Provider value={{
@@ -27,11 +39,19 @@ const UserContextProvider = (props) => {
             signer,
             isCorrectNetwork,
             nativeBalance,
+            ETHxBalance,
+            stETHBalance,
+            isETHxApproved,
+            isStETHApproved,
             setAddress,
             setProvider,
             setSigner,
             setIsCorrectNetwork,
             setNativeBalance,
+            setETHxBalance,
+            setStETHBalance,
+            setIsETHxApproved,
+            setIsStETHApproved,
         }}>
             {props.children}
         </UserContext.Provider>

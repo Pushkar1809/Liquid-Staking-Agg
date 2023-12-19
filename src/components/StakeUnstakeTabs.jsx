@@ -1,5 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
+import { useLido } from '../hooks/useLido';
+import { useStader } from '../hooks/useStader';
 
 const Tabs = styled.div`
 	position: absolute;
@@ -21,10 +23,22 @@ const Tab = styled.div`
 `;
 
 const StakeUnstakeTabs = ({activeTask, setActiveTask}) => {
+	const {getBalance: getStETHBalance, isApproved: isStETHApproved} = useLido();
+	const {getBalance: getETHxBalance, isApproved: isETHxApproved} = useStader();
+	
+
+
+	const handleUnstakeClick = () => {
+		setActiveTask('unstake')
+		getStETHBalance();
+		getETHxBalance();
+		isStETHApproved();
+		isETHxApproved();
+	}
     return (
 			<Tabs>
-				<Tab onClick={()=> setActiveTask('stake')} style={{ opacity: activeTask === "stake" ? 1 : 0.5 }}>Stake</Tab>
-				<Tab onClick={() => setActiveTask('unstake')} style={{ opacity: activeTask === "unstake" ? 1 : 0.5 }}>
+				<Tab onClick={() => setActiveTask('stake')} style={{ opacity: activeTask === "stake" ? 1 : 0.5 }}>Stake</Tab>
+				<Tab onClick={handleUnstakeClick} style={{ opacity: activeTask === "unstake" ? 1 : 0.5 }}>
 					Unstake
 				</Tab>
 			</Tabs>
