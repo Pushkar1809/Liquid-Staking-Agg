@@ -54,7 +54,7 @@ export const useLido = () => {
 
     const approve = async (amount=10) => {
         try {
-            const tx = await contracts.lido.approve(address, parseEther(amount));
+            const tx = await contracts.lido.approve(withdrawlQueueAddress, parseEther(amount));
             console.log("Approved Successfully", tx);
         } catch (err) {
             console.log("Failed to Approve stETH", err);
@@ -63,8 +63,11 @@ export const useLido = () => {
 
     const isApproved = async () => {
 			try {
-				const allowance = await contracts.lido.allowance(address, address);
-                setIsStETHApproved(allowance !== '0n')
+				const allowance = await contracts.lido.allowance(
+					address,
+					withdrawlQueueAddress,
+				);
+                setIsStETHApproved(allowance > parseEther("0"))
 			} catch (err) {
 				console.log("Failed to check approval status", err);
 			}

@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import styled from 'styled-components';
 import { useLido } from '../hooks/useLido';
 import { useStader } from '../hooks/useStader';
+import { UserContext } from '../context/UserContext';
 
 const Tabs = styled.div`
 	position: absolute;
@@ -25,16 +26,19 @@ const Tab = styled.div`
 const StakeUnstakeTabs = ({activeTask, setActiveTask}) => {
 	const {getBalance: getStETHBalance, isApproved: isStETHApproved} = useLido();
 	const {getBalance: getETHxBalance, isApproved: isETHxApproved} = useStader();
-	
+	const {provider} = useContext(UserContext);
 
 
 	const handleUnstakeClick = () => {
 		setActiveTask('unstake')
-		getStETHBalance();
-		getETHxBalance();
-		isStETHApproved();
-		isETHxApproved();
+		if (provider) {
+			getStETHBalance();
+			getETHxBalance();
+			isStETHApproved();
+			isETHxApproved();
+		}
 	}
+
     return (
 			<Tabs>
 				<Tab onClick={() => setActiveTask('stake')} style={{ opacity: activeTask === "stake" ? 1 : 0.5 }}>Stake</Tab>

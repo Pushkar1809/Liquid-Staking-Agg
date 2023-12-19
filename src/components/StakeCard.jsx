@@ -8,6 +8,7 @@ import { useStader } from '../hooks/useStader';
 import { useLido } from "../hooks/useLido";
 import { parseEther, formatUnits } from 'ethers';
 import { handleDecimals } from '../utils/handleDecimals';
+import { ethers } from 'ethers';
 
 const Card = styled.div`
 	min-width: 50ch;
@@ -107,6 +108,7 @@ const StakeCard = ({setAlert}) => {
 		unstake: staderUnstake,
 		approve: approveETHx,
 		getExchangeRate: getStaderExchangeRate,
+		getBalance: getETHxBalance,
 	} = useStader();
 
 	const {
@@ -114,11 +116,23 @@ const StakeCard = ({setAlert}) => {
 		stake: lidoStake,
 		unstake: lidoUnstake,
 		approve: approveStETH,
+		getBalance: getStETHBalance,
 	} = useLido();
     const [activeTask, setActiveTask] = useState('stake');
     const [protocol, setProtocol] = useState('stader');
 	const [amount, setAmount] = useState("");
-	const {provider, nativeBalance, ETHxBalance, stETHBalance, isETHxApproved, isStETHApproved } = useContext(UserContext);
+	const {
+		address,
+		provider,
+		nativeBalance,
+		ETHxBalance,
+		stETHBalance,
+		isETHxApproved,
+		isStETHApproved,
+		setIsETHxApproved,
+		setIsStETHApproved,
+		setNativeBalance,
+	} = useContext(UserContext);
 
 	useEffect(() => {
 		const getRate = async () => {
@@ -133,7 +147,7 @@ const StakeCard = ({setAlert}) => {
 		}
 	}, [provider, protocol, getStaderExchangeRate])
 
-	const handleStakeClick = () => {
+	const handleStake = async () => {
 		if (protocol === "stader") {
 			staderStake(parseEther(`${amount}`));
 			setAlert({
@@ -155,6 +169,7 @@ const StakeCard = ({setAlert}) => {
 					});
 				},
 			);
+			getETHxBalance();
 		} else {
 			lidoStake(parseEther(`${amount}`));
 			setAlert({
@@ -170,21 +185,21 @@ const StakeCard = ({setAlert}) => {
 					level: "success",
 				});
 			});
+			getStETHBalance();
 		}
+		const nativeBalanceWei = await provider.getBalance(address);
+		const nativeBalance = ethers.formatEther(nativeBalanceWei);
+		setNativeBalance(nativeBalance);
 		setAmount("")
 	}
 
 	const handleETHxApprove = () => {
 		approveETHx(ETHxBalance);
-		setAlert({
-			content: "Approval request being processed...",
-			isOpen: true,
-			level: "warning",
-		});
 		staderContracts.ETHx.on("Approval", (from, to, amount) => {
+			setIsETHxApproved(true);
 			setAlert({
 				title: "ETHx Approved",
-				content: `${handleDecimals(formatUnits(amount, 18))}ETHx approved for ${to}`,
+				content: `${handleDecimals(formatUnits(amount, 18))}ETHx approved`,
 				isOpen: true,
 				level: "success",
 			});
@@ -193,27 +208,31 @@ const StakeCard = ({setAlert}) => {
 
 	const handleETHxUnstake = () => {
 		staderUnstake(parseEther(`${amount}`));
-		setAlert({
-			content: "Staking in progress...",
-			isOpen: true,
-			level: "warning",
-		});
+		staderContracts.userWithdrawlManager.on(
+			"WithdrawRequestReceived",
+			(from, to, shares, amount) => {
+				setAlert({
+					title: "ETHx Unstaked Successfully",
+					content: `${handleDecimals(formatUnits(amount, 18))}ETHx unstaked on request from ${from}`,
+					isOpen: true,
+					level: "success",
+				});
+			},
+		);
+		getETHxBalance();
 		setAmount("");
 	}
 
 	const handleStETHApprove = () => {
 		approveStETH(stETHBalance);
-		setAlert({
-			content: "Approval request being processed...",
-			isOpen: true,
-			level: "warning",
-		});
-		lidoContracts.lido.on("Approval", (from, to, amount) => {
+		lidoContracts.lido.on("Approval", (from, to, amount,x) => {
+			console.log(from, to, amount, x)
+			setIsStETHApproved(true);
 			setAlert({
 				title: "stETH Approved",
 				content: `${handleDecimals(
 					formatUnits(amount, 18),
-				)}stETH approved for ${to}`,
+				)}stETH approved`,
 				isOpen: true,
 				level: "success",
 			});
@@ -222,31 +241,25 @@ const StakeCard = ({setAlert}) => {
 
 	const handleStETHUnstake = () => {
 		lidoUnstake(parseEther(`${amount}`));
-		setAlert({
-			content: "Staking in progress...",
-			isOpen: true,
-			level: "warning",
+		lidoContracts.withdrawlQueue.on("WithdrawalRequested", (id, requestor, owner, amount, shares) => {
+			setAlert({
+				title: "stETH Unstaked Successfully!",
+				content: `${handleDecimals(formatUnits(amount, 18))}stETH unstake on request from ${requestor}`,
+				isOpen: true,
+				level: "success",
+			});
 		});
+		getStETHBalance();
 		setAmount("");
 	}
 
-	const handleApproval = (approveFunction, approvalMessage, approvedTitle) => {
-		approveFunction();
+	const handleApproval = (approveFunction, approvalMessage) => {
 		setAlert({
 			content: approvalMessage,
 			isOpen: true,
 			level: "warning",
 		});
-		staderContracts.ETHx.on("Approval", (from, to, amount) => {
-			setAlert({
-				title: approvedTitle,
-				content: `${handleDecimals(
-					formatUnits(amount, 18),
-				)}${approvedTitle} approved for ${to}`,
-				isOpen: true,
-				level: "success",
-			});
-		});
+		approveFunction();
 	};
 
 	const handleUnstake = (unstakeFunction, unstakeMessage) => {
@@ -271,7 +284,7 @@ const StakeCard = ({setAlert}) => {
 				<ActionBtn
 					disabled={!amount}
 					onClick={() =>
-						handleUnstake(unstakeFunction, "Staking in progress...")
+						handleUnstake(unstakeFunction, "Unstaking in progress...")
 					}>
 					Unstake
 				</ActionBtn>
@@ -283,7 +296,7 @@ const StakeCard = ({setAlert}) => {
 						handleApproval(
 							approveFunction,
 							"Approval request being processed...",
-							`${protocol} Approved`,
+							`${protocol.toUpperCase()} Approved`,
 						)
 					}>
 					Approve
@@ -399,7 +412,7 @@ const StakeCard = ({setAlert}) => {
 				{!provider ? (
 					<ActionBtn onClick={initialise}>Connect Wallet</ActionBtn>
 				) : activeTask === "stake" ? (
-					<ActionBtn disabled={!amount} onClick={handleStakeClick}>
+					<ActionBtn disabled={!amount} onClick={handleStake}>
 						Stake
 					</ActionBtn>
 				) : (renderApproveOrUnstakeBtn())}

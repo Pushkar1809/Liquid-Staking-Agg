@@ -47,9 +47,6 @@ export const useStader = () => {
         console.log(value)
         try {
             const tx = await contracts.userWithdrawlManager.requestWithdraw(value, address);
-            contracts.userWithdrawlManager.on("WithdrawRequestReceived", (a, b, c, d) => {
-                console.log(a, b, c, d);
-            });
             // console.log("Unstaking Successful!", tx);
         } catch (err) {
             console.error("Unstaking Failed", err);
@@ -71,25 +68,28 @@ export const useStader = () => {
             const balance = await contracts.ETHx.balanceOf(address);
             setETHxBalance(formatUnits(balance, 18));
         } catch (err) {
-            console.err("Failed to get balance", err);
+            console.error("Failed to get balance", err);
         }
     };
 
     const approve = async (amount=10) => {
         try {
-            const tx = await contracts.ETHx.approve(address, parseEther(amount));
+            const tx = await contracts.ETHx.approve(userWithdrawlManagerAddress, parseEther(amount));
             console.log("Approved Successfully", tx);
         } catch (err) {
-            console.log("Failed to Approve ETHx", err)
+            console.error("Failed to Approve ETHx", err)
         }
     }
 
     const isApproved = async () => {
         try {
-            const allowance = await contracts.ETHx.allowance(address, address);
-            setIsETHxApproved(allowance !== '0n');
+            const allowance = await contracts.ETHx.allowance(
+							address,
+							userWithdrawlManagerAddress,
+						);
+            setIsETHxApproved(allowance > parseEther("0"));
         } catch (err) {
-            console.log("Failed to check approval status", err);
+            console.error("Failed to check approval status", err);
         }
     }
 
