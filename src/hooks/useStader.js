@@ -1,4 +1,4 @@
-import {Contract, parseEther, formatUnits, ZeroAddress} from 'ethers';
+import {Contract, parseEther, formatUnits} from 'ethers';
 import { useContext, useState, useEffect } from 'react';
 import { UserContext } from '../context/UserContext';
 import StaderPoolManagerABI from "../abis/StaderPoolManagerABI.json";
@@ -36,8 +36,7 @@ export const useStader = () => {
 
     const stake = async (value) => {
         try {
-            const ETHxAmount = await contracts.staderPoolManager.deposit(address, 1, {value});
-            console.log("Staked Successfully", ETHxAmount);
+            await contracts.staderPoolManager.deposit(address, 1, {value});
         } catch (err) {
             console.error("Failed to stake", err)
         }
@@ -46,8 +45,7 @@ export const useStader = () => {
     const unstake = async (value) => {
         console.log(value)
         try {
-            const tx = await contracts.userWithdrawlManager.requestWithdraw(value, address);
-            // console.log("Unstaking Successful!", tx);
+            await contracts.userWithdrawlManager.requestWithdraw(value, address);
         } catch (err) {
             console.error("Unstaking Failed", err);
         }
@@ -74,8 +72,7 @@ export const useStader = () => {
 
     const approve = async (amount=10) => {
         try {
-            const tx = await contracts.ETHx.approve(userWithdrawlManagerAddress, parseEther(amount));
-            console.log("Approved Successfully", tx);
+            await contracts.ETHx.approve(userWithdrawlManagerAddress, parseEther(amount));
         } catch (err) {
             console.error("Failed to Approve ETHx", err)
         }

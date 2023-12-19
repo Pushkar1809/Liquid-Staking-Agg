@@ -148,7 +148,7 @@ const StakeCard = ({setAlert}) => {
 		if(provider) {
 			getRate();
 		}
-	}, [provider, protocol, getStaderExchangeRate])
+	}, [provider, protocol, getStaderExchangeRate, getLidoExchangeRate])
 
 	const handleStake = async () => {
 		if (protocol === "stader") {

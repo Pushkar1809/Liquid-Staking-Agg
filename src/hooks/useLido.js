@@ -5,7 +5,7 @@ import { useContext, useState, useEffect } from 'react';
 import { UserContext } from '../context/UserContext';
 
 export const useLido = () => {
-    const { provider, signer, address, setIsStETHApproved, setStETHBalance } = useContext(UserContext);
+    const { signer, address, setIsStETHApproved, setStETHBalance } = useContext(UserContext);
     const [contracts, setContracts] = useState({
         lido: null,
         withdrawlQueue: null
@@ -26,8 +26,7 @@ export const useLido = () => {
 
     const stake = async (value) => {
         try {
-            const amountstETH = await contracts.lido.submit(ZeroAddress, {value});
-            // console.log("Staked Successfully!", amountstETH);
+            await contracts.lido.submit(ZeroAddress, {value});
         } catch (err) {
             console.error("Failed to Stake", err);
         }
@@ -36,8 +35,7 @@ export const useLido = () => {
     const unstake = async (value) => {
         console.log(value);
         try {
-            const tx = await contracts.withdrawlQueue.requestWithdrawals([value], address);
-            // console.log("Unstaked Successfully!", tx);
+            await contracts.withdrawlQueue.requestWithdrawals([value], address); 
         } catch (err) {
             console.error("Failed to Unstake", err);
         }
@@ -54,8 +52,7 @@ export const useLido = () => {
 
     const approve = async (amount=10) => {
         try {
-            const tx = await contracts.lido.approve(withdrawlQueueAddress, parseEther(amount));
-            console.log("Approved Successfully", tx);
+            await contracts.lido.approve(withdrawlQueueAddress, parseEther(amount));
         } catch (err) {
             console.log("Failed to Approve stETH", err);
         }
@@ -76,7 +73,6 @@ export const useLido = () => {
     const getExchangeRate = async () => {
         try {
             const rate = await contracts.lido.getPooledEthByShares(1);
-            console.log(rate);
             return rate;
         } catch (err) {
             console.error("Failed to get exhange rate", err);
