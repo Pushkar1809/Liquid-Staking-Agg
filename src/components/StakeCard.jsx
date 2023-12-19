@@ -117,6 +117,7 @@ const StakeCard = ({setAlert}) => {
 		unstake: lidoUnstake,
 		approve: approveStETH,
 		getBalance: getStETHBalance,
+		getExchangeRate: getLidoExchangeRate,
 	} = useLido();
     const [activeTask, setActiveTask] = useState('stake');
     const [protocol, setProtocol] = useState('stader');
@@ -139,8 +140,10 @@ const StakeCard = ({setAlert}) => {
 			let rate;
 			if (protocol === "stader") {
 				rate = await getStaderExchangeRate();
+			} else {
+				rate = await getLidoExchangeRate();
 			}
-			setExchangeRate(1/rate);
+			setExchangeRate(1/Number(rate));
 		}
 		if(provider) {
 			getRate();

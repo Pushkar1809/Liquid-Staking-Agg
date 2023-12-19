@@ -62,17 +62,27 @@ export const useLido = () => {
     }
 
     const isApproved = async () => {
-			try {
-				const allowance = await contracts.lido.allowance(
-					address,
-					withdrawlQueueAddress,
-				);
-                setIsStETHApproved(allowance > parseEther("0"))
-			} catch (err) {
-				console.log("Failed to check approval status", err);
-			}
-		};
+        try {
+            const allowance = await contracts.lido.allowance(
+                address,
+                withdrawlQueueAddress,
+            );
+            setIsStETHApproved(allowance > parseEther("0"))
+        } catch (err) {
+            console.log("Failed to check approval status", err);
+        }
+    };
 
-    return {contracts, stake, unstake, getBalance, approve, isApproved};
+    const getExchangeRate = async () => {
+        try {
+            const rate = await contracts.lido.getPooledEthByShares(1);
+            console.log(rate);
+            return rate;
+        } catch (err) {
+            console.error("Failed to get exhange rate", err);
+        }
+    }
+
+    return {contracts, stake, unstake, getBalance, approve, isApproved, getExchangeRate};
 }
 
