@@ -140,7 +140,7 @@ const StakeCard = ({setAlert}) => {
 			if (protocol === "stader") {
 				rate = await getStaderExchangeRate();
 			}
-			setExchangeRate(rate);
+			setExchangeRate(1/rate);
 		}
 		if(provider) {
 			getRate();
@@ -392,7 +392,7 @@ const StakeCard = ({setAlert}) => {
 							<label>You will recieve</label>
 							<span>
 								<Strong>
-									{amount ? handleDecimals(amount / exchangeRate) : 0}
+									{!amount ? 0 : activeTask==='stake' ? handleDecimals(amount * exchangeRate) : handleDecimals(amount / exchangeRate)}
 								</Strong>
 								{protocol === "stader" ? "ETHx" : "stETH"}
 							</span>
