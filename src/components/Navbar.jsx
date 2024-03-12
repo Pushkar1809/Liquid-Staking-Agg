@@ -15,7 +15,7 @@ const Nav = styled.div`
 const Navbar = () => {
     return (
 			<Nav>
-				<div className="logo">Staking Assignment</div>
+				<div className="logo">Liquid Staking (Testnet)</div>
 				<ConnectWallet />
 			</Nav>
 		);
