@@ -1,65 +1,65 @@
-import {Contract, formatUnits, parseEther} from 'ethers';
-import {useContext, useEffect, useState} from 'react';
+import { Contract, formatUnits, parseEther } from "ethers";
+import { useContext, useEffect, useState } from "react";
 
 import ETHxABI from "../abis/ETHxABI.json";
 import StaderPoolManagerABI from "../abis/StaderPoolManagerABI.json";
-import userWithdrawlManagerABI from "../abis/UserWithdrawlManagerABI.json"
-import {UserContext} from '../context/UserContext';
+import userWithdrawlManagerABI from "../abis/UserWithdrawlManagerABI.json";
+import { UserContext } from "../context/UserContext";
 
 export const useStader = () => {
-  const {signer, address, setIsETHxApproved, setETHxBalance} =
-      useContext(UserContext);
-  const [contracts, setContracts] = useState(
-      {staderPoolManager : null, ETHx : null, userWithdrawlManager : null});
+  const { signer, address, setIsETHxApproved, setETHxBalance } =
+    useContext(UserContext);
+  const [contracts, setContracts] = useState({
+    staderPoolManager: null,
+    ETHx: null,
+    userWithdrawlManager: null,
+  });
 
   const staderPoolManagerAdress = "0x7F09ceb3874F5E35Cd2135F56fd4329b88c5d119";
   const ETHxAddress = "0xB4F5fc289a778B80392b86fa70A7111E5bE0F859";
   const userWithdrawlManagerAddress =
-      "0x3F6F1C1081744c18Bd67DD518F363B9d4c76E1d2";
+    "0x3F6F1C1081744c18Bd67DD518F363B9d4c76E1d2";
 
   useEffect(() => {
     const staderPoolManager = new Contract(
-        staderPoolManagerAdress,
-        StaderPoolManagerABI,
-        signer,
+      staderPoolManagerAdress,
+      StaderPoolManagerABI,
+      signer,
     );
     const ETHx = new Contract(ETHxAddress, ETHxABI, signer);
     const userWithdrawlManager = new Contract(
-        userWithdrawlManagerAddress,
-        userWithdrawlManagerABI,
-        signer,
+      userWithdrawlManagerAddress,
+      userWithdrawlManagerABI,
+      signer,
     );
-    setContracts({staderPoolManager, ETHx, userWithdrawlManager});
-  }, [ signer ]);
+    setContracts({ staderPoolManager, ETHx, userWithdrawlManager });
+  }, [signer]);
 
-  const stake =
-      async (value) => {
+  const stake = async (value) => {
     try {
-      await contracts.staderPoolManager.deposit(address, 1, {value});
+      await contracts.staderPoolManager.deposit(address, 1, { value });
     } catch (err) {
-      console.error("Failed to stake", err)
+      console.error("Failed to stake", err);
     }
-  }
+  };
 
-  const unstake =
-      async (value) => {
-    console.log(value)
+  const unstake = async (value) => {
+    console.log(value);
     try {
       await contracts.userWithdrawlManager.requestWithdraw(value, address);
     } catch (err) {
       console.error("Unstaking Failed", err);
     }
-  }
+  };
 
-  const getExchangeRate =
-      async () => {
+  const getExchangeRate = async () => {
     try {
       const rate = await contracts.staderPoolManager.getExchangeRate();
       return formatUnits(rate, 18);
     } catch (err) {
       console.error("Getting Exchange Rate unscessesful", err);
     }
-  }
+  };
 
   const getBalance = async () => {
     try {
@@ -70,28 +70,28 @@ export const useStader = () => {
     }
   };
 
-  const approve =
-      async (amount = 10) => {
+  const approve = async (amount = 10) => {
     try {
-      await contracts.ETHx.approve(userWithdrawlManagerAddress,
-                                   parseEther(amount));
+      await contracts.ETHx.approve(
+        userWithdrawlManagerAddress,
+        parseEther(amount),
+      );
     } catch (err) {
-      console.error("Failed to Approve ETHx", err)
+      console.error("Failed to Approve ETHx", err);
     }
-  }
+  };
 
-  const isApproved =
-      async () => {
+  const isApproved = async () => {
     try {
       const allowance = await contracts.ETHx.allowance(
-          address,
-          userWithdrawlManagerAddress,
+        address,
+        userWithdrawlManagerAddress,
       );
       setIsETHxApproved(allowance > parseEther("0"));
     } catch (err) {
       console.error("Failed to check approval status", err);
     }
-  }
+  };
 
   return {
     contracts,
@@ -100,6 +100,6 @@ export const useStader = () => {
     getExchangeRate,
     getBalance,
     approve,
-    isApproved
+    isApproved,
   };
-}
+};
