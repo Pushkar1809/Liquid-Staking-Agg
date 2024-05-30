@@ -46,7 +46,7 @@ export const useLido = () => {
             const balance = await contracts.lido.balanceOf(address);
             setStETHBalance(formatUnits(balance, 18));
         } catch (err) {
-            console.err("Failed to get balance", err);
+            console.error("Failed to get balance", err);
         }
     }
 

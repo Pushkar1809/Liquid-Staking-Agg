@@ -14,10 +14,10 @@ export const useStader = () => {
     });
 
     const staderPoolManagerAdress =
-			"0xd0e400Ec6Ed9C803A9D9D3a602494393E806F823";
-    const ETHxAddress = "0x3338eCd3ab3d3503c55c931d759fA6d78d287236";
+			"0x7F09ceb3874F5E35Cd2135F56fd4329b88c5d119";
+    const ETHxAddress = "0xB4F5fc289a778B80392b86fa70A7111E5bE0F859";
     const userWithdrawlManagerAddress =
-			"0x1048Eca024cB2Ba5eA720Ac057D804E95a809Fc8";
+			"0x3F6F1C1081744c18Bd67DD518F363B9d4c76E1d2";
 
     useEffect(() => {
         const staderPoolManager = new Contract(

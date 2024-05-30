@@ -14,7 +14,7 @@ export const useUser = () => {
         const userAddress = await localSigner.getAddress();
         setAddress(userAddress)
         const network = await localProvider.getNetwork();
-        setIsCorrectNetwork(network.name === 'goerli');
+        setIsCorrectNetwork(Number(network.chainId) === 17000);
 		const nativeBalanceWei = await localProvider.getBalance(userAddress);
 		const nativeBalance = ethers.formatEther(nativeBalanceWei);
 		setNativeBalance(nativeBalance);

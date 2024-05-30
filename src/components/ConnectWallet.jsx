@@ -74,7 +74,7 @@ const ConnectWallet = () => {
 									}}
 									style={{ background: "red", marginRight: "0.75rem" }}>
 									{width > 768 ? (
-										"Switch to Goerli"
+										"Switch to Holesky"
 									) : isNetworkErrorVisible ? (
 										<RxCross2 />
 									) : (
@@ -83,7 +83,7 @@ const ConnectWallet = () => {
 								</Button>
 								{width <= 768 && isNetworkErrorVisible && (
 									<ModalCard style={{ color: "red", borderColor: "red", minWidth: "17ch" }}>
-										Switch to Goerli
+										Switch to Holesky
 									</ModalCard>
 								)}
 							</>
